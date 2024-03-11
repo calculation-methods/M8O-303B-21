@@ -1,2 +1,7 @@
-*.pdf
-.DS_Store
+.vs/
+CMakeSettings.json
+CppProperties.json
+*.exe
+.idea
+venv
+__pycache__
