@@ -56,3 +56,22 @@ class Matrix:
 
     def __getitem__(self, index: int):
         return self.values[index]
+
+
+def multiple_matrix(matrix1: Matrix, matrix2: Matrix) -> None | Matrix:
+    n1, m1 = matrix1.get_shape()
+    n2, m2 = matrix2.get_shape()
+    if m1 != n2:  # TODO: implement custom Error for matrices
+        print("Incorrect shapes of matrices")
+        return
+    res: list[list[None | int | float]] = [[None]*m2 for _ in range(n1)]
+    n, m, h = n1, m2, m1
+    del n1, n2, m1, m2
+    for i in range(n):
+        for j in range(m):
+            cntr = 0
+            for k in range(h):
+                cntr += matrix1.values[i][k] * matrix2.values[k][j]
+            res[i][j] = cntr
+
+    return Matrix(res)
