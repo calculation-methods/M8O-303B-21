@@ -21,7 +21,7 @@ def tridiagonal_algorithm(coefficients: Matrix, results: Matrix) -> Matrix:
     for i in range(decisions.__len__()-2, -1, -1):
         decisions[i] = P[i]*decisions[i+1] + Q[i]
 
-    return Matrix([decisions])
+    return Matrix([[i] for i in decisions])
 
 
 if __name__ == "__main__":
