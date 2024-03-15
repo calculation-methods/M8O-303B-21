@@ -10,8 +10,7 @@ def tridiagonal_algorithm(coefficients: Matrix, results: Matrix) -> Matrix:
 
     P[0], Q[0] = -c/b, d/b
     for i in range(1, coefficients.n-1):
-        print(i)
-        a, b, c, d = coefficients[i][i-1], coefficients[i][i], coefficients.values[i][i+1], results[i][0]
+        a, b, c, d = coefficients[i][i-1], coefficients[i][i], coefficients[i][i+1], results[i][0]
         P[i] = -c/(b + a*P[i-1])
         Q[i] = (d - a*Q[i-1])/(b + a*P[i-1])
     a, b, c, d = coefficients[-1][-2], coefficients[-1][-1], 0, results[-1][0]
