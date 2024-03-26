@@ -1,0 +1,17 @@
+name: Lab checking
+
+on: [ "pull_request" ]
+
+jobs:
+  compilation:
+    name: checking
+    runs-on: ubuntu-latest
+    steps:
+#      - name: clone git repo
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+      - name: working with repo
+        run: |
+          cd stud/pivovarov
+          make lab1
