@@ -75,3 +75,15 @@ def multiple_matrix(matrix1: Matrix, matrix2: Matrix) -> None | Matrix:
             res[i][j] = cntr
 
     return Matrix(res)
+
+
+def plus_matrix(matrix1: Matrix, matrix2: Matrix) -> Matrix:
+    n, m = matrix1.get_shape()
+    res: list[list[float]] = [[matrix1[i][j]+matrix2[i][j] for j in range(m)] for i in range(n)]
+    return Matrix(res)
+
+
+def minus_matrix(matrix1: Matrix, matrix2: Matrix) -> Matrix:
+    n, m = matrix1.get_shape()
+    res: list[list[float]] = [[matrix1[i][j]-matrix2[i][j] for j in range(m)] for i in range(n)]
+    return Matrix(res)
