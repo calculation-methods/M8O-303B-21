@@ -1,0 +1,17 @@
+name: Lab checking
+
+on:
+  pull_request:
+    types: [opened, ready_for_review, reopened]
+
+jobs:
+  compilation:
+    name: checking
+    runs-on: ubuntu-latest
+    steps:
+      - name: working with git
+      run: |
+	  pwd
+	  echo "test git"
+	  git show --name-only
+	  git branch
