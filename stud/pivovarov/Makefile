@@ -1,2 +1,5 @@
 lab1:
-	cat input.txt output.txt	
+	./program 	
+
+program: hello_github.c
+	gcc -c hello_github.c -o program

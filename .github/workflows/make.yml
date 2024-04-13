@@ -13,5 +13,6 @@ jobs:
           fetch-depth: 2
       - name: working with repo
         run: |
+	  dirname=git diff HEAD^..HEAD --name-only
           cd stud/pivovarov
           make lab1
