@@ -1,5 +1,5 @@
-lab1:
-	./program 	
+lab1: a.out
+	@./a.out
 
-program: hello_github.c
-	gcc -c hello_github.c -o program
+a.out: hello_github.c
+	gcc -c hello_github.c
