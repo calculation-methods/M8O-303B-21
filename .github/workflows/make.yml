@@ -1,17 +1,17 @@
 name: Lab checking
 
-on: [ "pull_request" ]
+on: [ "pull_request_target" ]
 
 jobs:
   compilation:
     name: checking
     runs-on: ubuntu-latest
     steps:
-#      - name: clone git repo
+      - name: clone git repo
       - uses: actions/checkout@v2
-        with:
-          fetch-depth: 2
-      - name: working with repo
+#        with:
+#          fetch-depth: 2
+#      - name: working with repo
         run: |
 #	  dirname=git diff HEAD^..HEAD --name-only
           cd stud/pivovarov
