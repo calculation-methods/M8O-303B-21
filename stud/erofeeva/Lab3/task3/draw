@@ -1,0 +1,1 @@
+g++ Plot.cpp -o temp -lsfml-graphics -lsfml-system -lsfml-window; ./temp; rm temp;
