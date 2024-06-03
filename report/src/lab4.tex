@@ -1,0 +1,70 @@
+\section* {4.1 Методы Эйлера, Рунге-Кутты и Адамса}
+
+\subsection{Постановка задачи}
+Реализовать методы Эйлера, Рунге-Кутты и Адамса 4-го порядка в виде программ, задавая в качестве входных данных шаг сетки  . С использованием разработанного программного обеспечения решить задачу Коши для ОДУ 2-го порядка на указанном отрезке. Оценить погрешность численного решения с использованием метода Рунге – Ромберга и путем сравнения с точным решением. 
+
+{\bfseries Вариант:} 24
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=15cm, height=3cm]{task}
+\caption{Входные данные}
+\end{figure}
+% \pagebreak
+
+\subsection{Результаты работы}
+\begin{figure}[h!]
+\centering
+\includegraphics[width=15cm, height=7.5cm]{img/lab4_1_res.png}
+\caption{Вывод программы в консоли}
+\end{figure}
+
+\pagebreak
+
+\subsection{Исходный код}
+
+\lstinputlisting{include/lab4.1/main.cpp}
+\lstinputlisting{include/lab4.1/adams.cpp}
+\lstinputlisting{include/lab4.1/adams.h}
+\lstinputlisting{include/lab4.1/euler.cpp}
+\lstinputlisting{include/lab4.1/euler.h}
+\lstinputlisting{include/lab4.1/funs.cpp}
+\lstinputlisting{include/lab4.1/funs.h}
+\lstinputlisting{include/lab4.1/runge_kutt.cpp}
+
+
+
+\pagebreak
+
+\section* {4.2 Метод стрельбы и конечно-разностный метод}
+
+\subsection{Постановка задачи}
+Реализовать метод стрельбы и конечно-разностный метод решения краевой задачи для ОДУ в виде программ. С использованием разработанного программного обеспечения решить краевую задачу для обыкновенного дифференциального уравнения 2-го порядка на указанном отрезке. Оценить погрешность численного решения с использованием метода Рунге – Ромберга и путем сравнения с точным решением. 
+
+{\bfseries Вариант:} 24
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=.9\textwidth]{img/task4_2.png}
+\caption{Входные данные}
+\end{figure}
+% \pagebreak
+
+\subsection{Результаты работы}
+\begin{figure}[h!]
+\centering
+\includegraphics[width=.9\textwidth]{img/lab4_2_res.png}
+\caption{Вывод программы в консоли}
+\end{figure}
+
+\pagebreak
+
+\subsection{Исходный код}
+
+\lstinputlisting{include/lab4.2/main.cpp}
+\lstinputlisting{include/lab4.2/finite_diff.cpp}
+\lstinputlisting{include/lab4.2/finite_diff.h}
+\lstinputlisting{include/lab4.2/shooting.cpp}
+\lstinputlisting{include/lab4.2/shooting.h}
+\lstinputlisting{include/lab4.2/funcs.cpp}
+\lstinputlisting{include/lab4.2/funcs.h}
