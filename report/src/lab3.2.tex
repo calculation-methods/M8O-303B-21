@@ -1,0 +1,32 @@
+\subsection{Постановка задачи}
+3.2. Построить кубический сплайн для функции, заданной в узлах интерполяции, предполагая, что сплайн имеет нулевую кривизну при $x=x_0$ и $x=x_4$. Вычислить значение функции в точке $x=X^*$.
+
+{\bfseries Вариант:} 19
+    \begin{equation}
+		X^*=0.1
+    \end{equation}
+    \begin{center}
+        \begin{tabular}{ |c|c|c|c|c|c| } 
+			 \hline
+			 $i$ & 0 & 1 & 2 & 3 & 4 \\ 
+			 \hline
+			 $x_i$ & -0.4 & -0.1 & 0.2 & 0.5 & 0.8 \\ 
+			 \hline
+			 $f_i$ & -0.81152 & -0.20017 & 0.40136 & 1.0236 & 1.7273 \\ 
+			 \hline
+        \end{tabular}
+    \end{center}
+\pagebreak
+
+\subsection{Результаты работы}
+\begin{figure}[h!]
+\centering
+\includegraphics[width=.5\textwidth]{lab3.2}
+\caption{Вывод в консоли}
+\end{figure}
+
+
+\subsection{Исходный код}
+\lstinputlisting[title=\texttt{Lab3.2.cpp}]{../stud/saifullin/task3.2/Lab3.2.cpp}
+\pagebreak
+
