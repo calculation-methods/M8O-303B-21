@@ -1,0 +1,663 @@
+\section* {1.1  LU -  разложение матриц}
+
+\subsection{Постановка задачи}
+Реализовать алгоритм LU -  разложения матриц (с выбором главного элемента) в виде программы. Используя разработанное программное обеспечение, решить систему линейных алгебраических уравнений (СЛАУ). Для матрицы СЛАУ вычислить определитель и обратную матрицу. 
+
+{\bfseries Вариант:} 28
+
+\begin{cases}
+& x_1+4x_2-9x_3+7x_4 = -67 \\
+& 2x_1-2x_2+-2x_3+3x_4 = -57 \\
+& -x_1+3x_2-9x_3-x_4 = -26 \\
+& -5x_1+2x_2+2x_3+x_4 = 52 \\
+\end{cases}
+%\pagebreak
+
+\subsection{Результаты работы}
+\begin{figure}[h!]
+\centering
+\includegraphics[width=.7\textwidth]{img/img1.jpg}
+\caption{Вывод программы в консоли}
+\end{figure}
+\pagebreak
+
+\subsection{Исходный код}
+Общие файлы для всех подзадач 1 лабораторной работы:
+
+begin{lstlisting}
+#include <iostream>
+#include <vector>
+#include <cmath>
+#include <tuple>
+
+
+using namespace std;
+
+typedef vector<vector<double>> Matrix;
+typedef vector<double> Vector;
+
+void printMatrix(const Matrix &mat) {
+    for (const auto &row : mat) {
+        for (double val : row) {
+            cout << val << " ";
+        }
+        cout << endl;
+    }
+}
+
+void printVector(const Vector &vec) {
+    for (double val : vec) {
+        cout << val << " ";
+    }
+    cout << endl;
+}
+
+double determinant(const Matrix& mat) {
+    int n = mat.size();
+    
+    if (n == 0) {
+        return 0;
+    }
+    if (n == 1) {
+        return mat[0][0];
+    }
+
+    double det = 0;
+    Matrix submatrix(n - 1, vector<double>(n - 1));
+
+    for (int i = 0; i < n; i++) {
+        int subi = 0;
+        for (int j = 1; j < n; j++) {
+            int subj = 0;
+            for (int k = 0; k < n; k++) {
+                if (k == i) {
+                    continue;
+                }
+                submatrix[subi][subj] = mat[j][k];
+                subj++;
+            }
+            subi++;
+        }
+        det += (i % 2 == 1 ? -1 : 1) * mat[0][i] * determinant(submatrix);
+    }
+
+    return det;
+}
+
+pair<Matrix, Matrix> luDecomposition(const Matrix &A) {
+    int n = A.size();
+    Matrix L(n, vector<double>(n, 0.0));
+    Matrix U(n, vector<double>(n, 0.0));
+
+    for (int i = 0; i < n; i++) {
+        L[i][i] = 1.0;
+
+        for (int k = i; k < n; k++) {
+            double sum = 0;
+            for (int j = 0; j < i; j++) {
+                sum += L[i][j] * U[j][k];
+            }
+            U[i][k] = A[i][k] - sum;
+        }
+
+        for (int k = i; k < n; k++) {
+            double sum = 0;
+            for (int j = 0; j < i; j++) {
+                sum += L[k][j] * U[j][i];
+            }
+            L[k][i] = (A[k][i] - sum) / U[i][i];
+        }
+    }
+
+    return make_pair(L, U);
+}
+
+Vector solveLinearEquationSystem(const Matrix &A, const Vector &b) {
+    int n = A.size();
+    Vector x(n);
+    Matrix L, U;
+    tie(L, U) = luDecomposition(A);
+
+    // Solve Ly = b
+    Vector y(n);
+    for (int i = 0; i < n; i++) {
+        double sum = 0;
+        for (int j = 0; j < i; j++) {
+            sum += L[i][j] * y[j];
+        }
+        y[i] = (b[i] - sum) / L[i][i];
+    }
+
+    // Solve Ux = y
+    for (int i = n - 1; i >= 0; i--) {
+        double sum = 0;
+        for (int j = i + 1; j < n; j++) {
+            sum += U[i][j] * x[j];
+        }
+        x[i] = (y[i] - sum) / U[i][i];
+    }
+
+    return x;
+}
+
+Matrix inverseMatrix(const Matrix &A) {
+    int n = A.size();
+    Matrix inverse(n, Vector(n, 0.0));
+    Matrix L, U;
+    tie(L, U) = luDecomposition(A);
+
+    Matrix identity(n, Vector(n, 0.0));
+    for (int i = 0; i < n; i++) {
+        identity[i][i] = 1.0;
+        Vector b = identity[i];
+        Vector x = solveLinearEquationSystem(A, b);
+        for (int j = 0; j < n; j++) {
+            inverse[j][i] = x[j];
+        }
+    }
+
+    return inverse;
+}
+
+int main() {
+    Matrix A = {{1, 4, -9, 7},
+                 {2, -2, -2, 3},
+                 {-1, 3, -9, -1},
+                 {-5, 2, 2, 1}};
+    Vector b = {-67, -57, -26, 52};
+
+    Vector x = solveLinearEquationSystem(A, b);
+
+    cout << "Solution x:" << endl;
+    printVector(x);
+
+    Matrix A_inv = inverseMatrix(A);
+
+    cout << "Inverse matrix A_inv:" << endl;
+    printMatrix(A_inv);
+    
+    double det = determinant(A);
+    cout << "Determinant:" << det << endl;
+
+    return 0;
+}
+end{lstlisting}
+%\pagebreak
+
+
+\section* {1.2  Метод прогонки}
+
+\subsection{Постановка задачи}
+Реализовать метод прогонки в виде программы, задавая в качестве входных данных ненулевые элементы матрицы системы и вектор правых частей. Используя разработанное программное обеспечение, решить СЛАУ с трехдиагональной матрицей.  
+
+{\bfseries Вариант:} 28
+
+\begin{cases}
+& 16x_1-9x_2 = -27 \\
+& 8x_1-13x_2-5x_3 = -84 \\
+& -3x_2-21x_3+9x_4= -255 \\
+& -9x_3+16x_4-5x_5 = -89 \\
+& x_4+-9x_5 = 69\\
+\end{cases}
+% \pagebreak
+
+\subsection{Результаты работы}
+\begin{figure}[h!]
+\centering
+\includegraphics[width=.7\textwidth]{img/img2}
+\caption{Вывод программы в консоли}
+\end{figure}
+\pagebreak
+
+
+\subsection{Исходный код}
+begin{lstlisting}
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+vector<double> solveTridiagonalMatrix(vector<double> a, vector<double> b, vector<double> c, vector<double> d) {
+    int n = d.size();
+
+    vector<double> alpha(n), beta(n), x(n);
+    alpha[0] = -c[0] / b[0];
+    beta[0] = d[0] / b[0];
+
+    for (int i = 1; i < n; ++i) {
+        double m = 1.0 / (b[i] + a[i] * alpha[i - 1]);
+        alpha[i] = -c[i] * m;
+        beta[i] = (d[i] - a[i] * beta[i - 1]) * m;
+    }
+
+    x[n - 1] = beta[n - 1];
+    for (int i = n - 2; i >= 0; --i) {
+        x[i] = alpha[i] * x[i + 1] + beta[i];
+    }
+
+    return x;
+}
+
+int main() {
+    vector<vector<double>> A = { {16, -9, 0, 0, 0},
+                                 {8, -13, -5, 0, 0},
+                                 {0, -3, -21, 9, 0},
+                                 {0, 0, -9, 16, -5},
+                                 {0, 0, 0, 1, -9} };
+
+    vector<double> b = { -27, -84, -225, -89, 69 };
+
+    // Извлекаем элементы из матрицы A для прогонки
+    vector<double> a, c, d;
+    vector<double> main_diag;
+    for (int i = 0; i < A.size(); ++i) {
+        main_diag.push_back(A[i][i]);
+        if (i > 0) {
+            a.push_back(A[i][i - 1]);
+        }
+        if (i < A.size() - 1) {
+            c.push_back(A[i][i + 1]);
+        }
+    }
+
+    d = b;
+
+    vector<double> result = solveTridiagonalMatrix(a, main_diag, c, d);
+
+    cout << "Решение СЛАУ:" << endl;
+    for (int i = 0; i < result.size(); ++i) {
+        cout << "x[" << i << "] = " << result[i] << endl;
+    }
+
+    return 0;
+}
+end{lstlisting}
+% \pagebreak
+\section* {1.3  Метод простых итераций. Метод Зейделя}
+
+\subsection{Постановка задачи}
+Реализовать метод простых итераций и метод Зейделя в виде программ, задавая в качестве входных данных матрицу системы, вектор правых частей и точность вычислений. Используя разработанное программное обеспечение, решить СЛАУ. Проанализировать количество итераций, необходимое для достижения заданной точности. 
+
+{\bfseries Вариант:} 28
+
+\begin{cases}
+
+& 10x_1+2x_3+4x_4 = 110 \\
+& 2x_1+16x_2-3x_3+8x_4 = 128 \\
+& x_1+5x_2+11x_3-4x_4 = 102 \\
+& 8x_1+x_2+6x_3-17x_4 = 81 \\
+\end{cases}
+% \pagebreak
+
+\subsection{Результаты работы}
+\begin{figure}[h!]
+\centering
+\includegraphics[width=15cm, height=10cm]{img/img3.jpg}
+\caption{Вывод программы в консоли}
+\end{figure}
+
+% \vfill
+
+\pagebreak
+
+\subsection{Исходный код}
+begin{lstlisting}
+#include <iostream>
+#include <vector>
+#include <cmath>
+
+using namespace std;
+
+const int N = 4; // размерность системы
+
+vector<vector<double>> A = { {10, 0, 2, 4}, {2, 16, -3, 8}, {1, 5, 11, -4}, {8, 1, 6, -17} };
+vector<double> b = { 110, 128, 102, 81 };
+
+vector<double> solveJacobi(vector<vector<double>> A, vector<double> b, double eps) {
+    vector<double> x(N, 0.0); // начальное приближение
+    vector<double> x_new(N);
+    int iter = 0;
+
+    while (true) {
+        for (int i = 0; i < N; i++) {
+            double sum = 0;
+            for (int j = 0; j < N; j++) {
+                if (j != i) {
+                    sum += A[i][j] * x[j];
+                }
+            }
+            x_new[i] = (b[i] - sum) / A[i][i];
+        }
+
+        double error = 0;
+        for (int i = 0; i < N; i++) {
+            error += abs(x_new[i] - x[i]);
+        }
+
+        if (error < eps) {
+            break;
+        }
+
+        x = x_new;
+        iter++;
+    }
+
+    cout << "The Jacobie method converges after " << iter << " iterations." << endl;
+    return x_new;
+}
+
+vector<double> solveGaussSeidel(vector<vector<double>> A, vector<double> b, double eps) {
+    vector<double> x(N, 0.0); // начальное приближение
+    vector<double> x_new(N);
+    int iter = 0;
+
+    while (true) {
+        for (int i = 0; i < N; i++) {
+            double sum1 = 0;
+            for (int j = 0; j < i; j++) {
+                sum1 += A[i][j] * x_new[j];
+            }
+
+            double sum2 = 0;
+            for (int j = i + 1; j < N; j++) {
+                sum2 += A[i][j] * x[j];
+            }
+
+            x_new[i] = (b[i] - sum1 - sum2) / A[i][i];
+        }
+
+        double error = 0;
+        for (int i = 0; i < N; i++) {
+            error += abs(x_new[i] - x[i]);
+        }
+
+        if (error < eps) {
+            break;
+        }
+
+        x = x_new;
+        iter++;
+    }
+
+    cout << "The Seidel method converges after " << iter << " iterations." << endl;
+    return x_new;
+}
+
+int main() {
+    double eps = 1e-6;
+
+    vector<double> solutionJacobi = solveJacobi(A, b, eps);
+    vector<double> solutionSeidel = solveGaussSeidel(A, b, eps);
+
+    cout << "Solution by Jacobie:" << endl;
+    for (int i = 0; i < N; i++) {
+        cout << "x[" << i + 1 << "] = " << solutionJacobi[i] << endl;
+    }
+
+    cout << "\nSolution by Seidel:" << endl;
+    for (int i = 0; i < N; i++) {
+        cout << "x[" << i + 1 << "] = " << solutionSeidel[i] << endl;
+    }
+
+    return 0;
+}
+end{lstlisting}
+% \pagebreak
+\section* {1.4  Метод вращений}
+
+\subsection{Постановка задачи}
+Реализовать метод вращений в виде программы, задавая в качестве входных данных матрицу и точность вычислений. Используя разработанное программное обеспечение, найти собственные значения и собственные векторы симметрических матриц. Проанализировать зависимость погрешности вычислений от числа итераций. 
+
+{\bfseries Вариант:} 28
+
+  \begin{pmatrix}
+    3 & 2 & 6 \\
+    2 & -3 & -7 \\
+    6 & 7 & 3
+  \end{pmatrix}
+% \pagebreak
+
+\subsection{Результаты работы}
+\begin{figure}[h!]
+\centering
+\includegraphics[width=.9\textwidth]{img/img4.jpg}
+\caption{Вывод программы в консоли}
+\end{figure}
+
+\pagebreak
+
+\subsection{Исходный код}
+begin{lstlisting}
+#include <iostream>
+#include <vector>
+#include <cmath>
+
+using namespace std;
+
+const double EPSILON = 1e-6; // �������� ����������
+
+vector<vector<double>> A = {{3, 2, 6}, {2, -3, -7}, {6, 7, 3}}; // �������� �������
+
+void printMatrix(const vector<vector<double>>& M) {
+    for (const auto& row : M) {
+        for (double elem : row) {
+            cout << elem << " ";
+        }
+        cout << endl;
+    }
+}
+
+pair<vector<double>, vector<vector<double>>> jacobiEigenvalue(const vector<vector<double>>& A) {
+    int n = A.size();
+    vector<vector<double>> R(n, vector<double>(n, 0.0));
+    for (int i = 0; i < n; i++) {
+        R[i][i] = 1.0;
+    }
+
+    bool changed = true;
+    while (changed) {
+        changed = false;
+        for (int p = 0; p < n; p++) {
+            for (int q = p + 1; q < n; q++) {
+                if (abs(A[p][q]) > EPSILON) {
+                    changed = true;
+                    double phi = (A[q][q] - A[p][p]) / (2.0 * A[p][q]);
+                    double t = (phi >= 0) ? 1.0 / (phi + sqrt(1 + phi * phi)) : -1.0 / (-phi + sqrt(1 + phi * phi));
+                    double c = 1.0 / sqrt(1 + t * t);
+                    double s = t * c;
+
+                    vector<double> Rp = R[p];
+                    vector<double> Rq = R[q];
+                    for (int i = 0; i < n; i++) {
+                        R[p][i] = c * Rp[i] - s * Rq[i];
+                        R[q][i] = s * Rp[i] + c * Rq[i];
+                    }
+
+                    for (int i = 0; i < n; i++) {
+                        if (i != p && i != q) {
+                            double Api = A[i][p];
+                            double Aiq = A[q][i];
+                            A[i][p] = c * Api - s * Aiq;
+                            A[p][i] = A[i][p];
+                            A[i][q] = c * Aiq + s * A[i][q];
+                            A[q][i] = A[i][q];
+                        }
+                    }
+
+                    double App = A[p][p];
+                    double Aqq = A[q][q];
+                    double Apq = A[p][q];
+                    A[p][p] = c * c * App - 2.0 * c * s * Apq + s * s * Aqq;
+                    A[q][q] = s * s * App + 2.0 * c * s * Apq + c * c * Aqq;
+                    A[p][q] = 0.0;
+                    A[q][p] = 0.0;
+                }
+            }
+        }
+    }
+
+    vector<double> eigenvalues;
+    vector<vector<double>> eigenvectors;
+    for (int i = 0; i < n; i++) {
+        eigenvalues.push_back(A[i][i]);
+        vector<double> eigenvector;
+        for (int j = 0; j < n; j++) {
+            eigenvector.push_back(R[j][i]);
+        }
+        eigenvectors.push_back(eigenvector);
+    }
+
+    return {eigenvalues, eigenvectors};
+}
+
+int main() {
+    pair<vector<double>, vector<vector<double>>> result = jacobiEigenvalue(A);
+    
+    cout << "����������� ��������:" << endl;
+    for (double val : result.first) {
+        cout << val << endl;
+    }
+    
+    cout << "����������� �������:" << endl;
+    for (const auto& vec : result.second) {
+        for (double elem : vec) {
+            cout << elem << " ";
+        }
+        cout << endl;
+    }
+
+    return 0;
+}
+end{lstlisting}
+% \pagebreak
+\section* {1.5  QR – разложение матриц}
+
+\subsection{Постановка задачи}
+Реализовать алгоритм QR – разложения матриц в виде программы. На его основе разработать программу, реализующую QR – алгоритм решения полной проблемы собственных значений произвольных матриц, задавая в качестве входных данных матрицу и точность вычислений. С использованием разработанного программного обеспечения найти собственные значения матрицы.
+
+
+{\bfseries Вариант:} 28
+
+  \begin{pmatrix}
+    -6 & -3 & 7 \\
+    9 & 1 & -6 \\
+    3 & -5 & 5
+  \end{pmatrix}
+% \pagebreak
+
+\subsection{Результаты работы}
+\begin{figure}[h!]
+\centering
+\includegraphics[width=.9\textwidth]{img/img5.jpg}
+\caption{Вывод программы в консоли}
+\end{figure}
+
+\pagebreak
+
+\subsection{Исходный код}
+begin{lstlisting}
+#include <iostream>
+#include <cmath>
+#include <vector>
+
+using namespace std;
+
+const double EPS = 1e-10;
+
+vector<vector<double>> matrixMultiply(const vector<vector<double>>& A, const vector<vector<double>>& B) {
+    int n = A.size();
+    int m = B[0].size();
+    vector<vector<double>> C(n, vector<double>(m, 0.0));
+
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < m; ++j) {
+            for (int k = 0; k < B.size(); ++k) {
+                C[i][j] += A[i][k] * B[k][j];
+            }
+        }
+    }
+
+    return C;
+}
+
+// Функция для вычисления QR-разложения матрицы
+void qrDecomposition(const vector<vector<double>>& A, vector<vector<double>>& Q, vector<vector<double>>& R) {
+    int n = A.size();
+    Q = R = vector<vector<double>>(n, vector<double>(n));
+
+    for (int j = 0; j < n; ++j) {
+        vector<double> v(n);
+        for (int i = 0; i < j; ++i) {
+            double dotProduct = 0;
+            for (int k = 0; k < n; ++k) {
+                dotProduct += Q[k][i] * A[k][j];
+            }
+            for (int k = 0; k < n; ++k) {
+                v[k] += dotProduct * Q[k][i];
+            }
+        }
+
+        double norm = 0;
+        for (int i = 0; i < n; ++i) {
+            v[i] = A[i][j] - v[i];
+            norm += v[i] * v[i];
+        }
+        norm = sqrt(norm);
+
+        for (int i = 0; i < n; ++i) {
+            Q[i][j] = v[i] / norm;
+        }
+
+        for (int i = 0; i <= j; ++i) {
+            R[i][j] = 0;
+            for (int k = 0; k < n; ++k) {
+                R[i][j] += Q[k][i] * A[k][j];
+            }
+        }
+    }
+}
+
+// Функция для получения собственных значений матрицы
+vector<double> eigenvaluesFromQR(const vector<vector<double>>& A, double eps) {
+    int n = A.size();
+    vector<vector<double>> Q, R;
+    qrDecomposition(A, Q, R);
+
+    vector<vector<double>> Ak = A;
+    while (true) {
+        qrDecomposition(Ak, Q, R);
+        Ak = matrixMultiply(R, Q);
+
+        bool converged = true;
+        for (int i = 0; i < n; ++i) {
+            if (abs(Ak[i][i] - R[i][i]) > eps) {
+                converged = false;
+                break;
+            }
+        }
+        if (converged) break;
+    }
+
+    vector<double> eigenvalues;
+    for (int i = 0; i < n; ++i) {
+        eigenvalues.push_back(Ak[i][i]);
+    }
+
+    return eigenvalues;
+}
+
+int main() {
+    vector<vector<double>> A = { {-6, -3, 7}, {9, 1, -6}, {3, -5, 5} };
+    double eps = 1e-6;
+
+    vector<double> eigenvalues = eigenvaluesFromQR(A, eps);
+
+    cout << "Собственные значения матрицы:" << endl;
+    for (int i = 0; i < eigenvalues.size(); ++i) {
+        cout << "λ" << i + 1 << " = " << eigenvalues[i] << endl;
+    }
+
+    return 0;
+}
+end{lstlisting}
+% \pagebreak
